@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpassword
+    ports:
+      - "3366:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - backend
+
+  proxysql:
+    image: proxysql/proxysql:2.4.8
+    container_name: proxysql
+    restart: always
+    ports:
+      - "6032:6032"  # Admin interface
+      - "6033:6033"  # MySQL client interface
+    volumes:
+      - ./proxysql.cnf:/etc/proxysql.cnf:ro
+    networks:
+      - backend
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+
+networks:
+  backend:
